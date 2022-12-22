@@ -19731,18 +19731,15 @@ acu:function acu(a,b){this.a=a
 this.b=b},
 avv(a){var s=t.jJ,r=A.eK(A.aeg(a,new A.ac3(),s),!0,s)
 return new A.X(r,new A.ac4(),A.Y(r).j("X<1,p>")).c7(0)},
-avj(a){var s,r,q,p,o,n=a.d,m=n!=null
-if((!m||a.c===n)&&a.e==null)return""
-s=""+"\n    @JsonKey("
-r=a.e
-q=r!=null
-if(q){p=a.a==="string"
-o=p?"'":""
-p=p?"'":""
-p=s+("defaultValue: "+o+r+p)
-s=p}if(q&&m&&a.c!==n)s+=", "
-n=(m&&a.c!==n?s+("name: '"+A.h(n)+"'"):s)+")"
-return n.charCodeAt(0)==0?n:n},
+avj(a){var s,r,q=a.d,p=q!=null
+if((!p||a.c===q)&&a.e==null)return""
+q=p&&a.c!==q?""+("\n    @JsonKey(name: '"+A.h(q)+"')"):""
+p=a.e
+if(p!=null){s=a.a==="string"
+r=s?"'":""
+s=s?"'":""
+s=q+("\n    @Default("+r+p+s+")")
+q=s}return q.charCodeAt(0)==0?q:q},
 ac3:function ac3(){},
 ac4:function ac4(){},
 avt(a){return new A.X(a,new A.ac0(),A.Y(a).j("X<1,p>")).c7(0)},
