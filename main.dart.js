@@ -22674,8 +22674,8 @@ else r=!1
 if(r)return"double"
 if(s&&b==="string")return"String"
 return"num"
-case"string":if(b!=null&&b==="binary")return"File"
-return"String"
+case"string":switch(b){case"binary":return"File"
+case"date":case"date-time":return"DateTime"}return"String"
 case"file":return"File"
 case"boolean":return"bool"
 case"object":return"Object"}return a},
@@ -22685,8 +22685,8 @@ case"number":s=b!=null
 if(s&&b==="float")return"Float"
 if(s&&b==="string")return"String"
 return"Double"
-case"string":if(b!=null&&b==="binary")return r
-return"String"
+case"string":switch(b){case"binary":return r
+case"date":case"date-time":return"Date"}return"String"
 case"file":return r
 case"boolean":return"Boolean"
 case"object":return"Any"}return a},
