@@ -21700,7 +21700,7 @@ s=new A.V(p,q.gdZ(),A.a_(p).j("V<1,o>")).cC(0)
 q=b?"package:freezed_annotation/freezed_annotation.dart":"package:json_annotation/json_annotation.dart"
 p=a.c
 r=A.m(p).j("dX<1,o>")
-return"import '"+q+"';\n\nenum "+s+" {\n  "+new A.dX(p,new A.akZ(a),r).bG(0,",\n  ")+";\n\n  const "+s+"();\n\n  factory "+s+".fromJson(Map<String, dynamic> json) =>\n      $enumDecode(_$"+s+"EnumMap, json);\n\n  "+A.asB(a.b,null)+" toJson() => _$"+s+"EnumMap[this]!;\n}\n\nconst _$"+s+"EnumMap = {\n  "+new A.dX(p,new A.al_(s,a),r).bG(0,",\n  ")+",\n};\n"},
+return"import '"+q+"';\n\n@JsonEnum()\nenum "+s+" {\n"+new A.dX(p,new A.akZ(a),r).bG(0,",\n")+";\n\n  "+A.asB(a.b,null)+" toJson() => _$"+s+"EnumMap[this]!;\n}\n\nconst _$"+s+"EnumMap = {\n  "+new A.dX(p,new A.al_(s,a),r).bG(0,",\n  ")+",\n};\n"},
 akZ:function akZ(a){this.a=a},
 al_:function al_(a,b){this.a=a
 this.b=b},
@@ -75771,7 +75771,9 @@ if(s===b.f)return 0
 else if(s)return-1
 return 1}}
 A.akZ.prototype={
-$1(a){return this.a.b!=="string"?A.bt("value"+a).git():A.bt(a).git()},
+$1(a){var s=this.a.b==="string",r=s?"'"+a+"'":a
+s=!s?A.bt("value"+a).git():A.bt(a).git()
+return"  @JsonValue("+r+")\n  "+s},
 $S:30}
 A.al_.prototype={
 $1(a){var s,r=this.b.b==="string",q=!r?A.bt("value"+a).git():A.bt(a).git()
