@@ -8,7 +8,7 @@ const RESOURCES = {
 "assets/fonts/MaterialIcons-Regular.otf": "e7069dfd19b331be16bed984668fe080",
 "assets/NOTICES": "844a4901d971cd55332c01dca1742e83",
 "assets/AssetManifest.json": "99914b932bd37a50b983c5e7c90ae93b",
-"main.dart.js": "36a54e56fde4a1e540cd28ecc42eb0a6",
+"main.dart.js": "88db61f501c9a78d194887d35593e995",
 "flutter.js": "a85fcf6324d3c4d3ae3be1ae4931e9c5",
 "canvaskit/profiling/canvaskit.js": "c21852696bc1cc82e8894d851c01921a",
 "canvaskit/profiling/canvaskit.wasm": "371bc4e204443b0d5e774d64a046eb99",
