@@ -25,7 +25,7 @@ const RESOURCES = {"flutter.js": "6fef97aeca90b426343ba6c5c9dc5d4a",
 "icons/Icon-192.png": "78bd8bbc766610628e17d93b8566f016",
 "icons/Icon-512.png": "73fe94ae4c5e0a1f309b0617f2e82251",
 "icons/Icon-maskable-512.png": "73fe94ae4c5e0a1f309b0617f2e82251",
-"main.dart.js": "99b8e7a8f5eeb84602243694407befcd",
+"main.dart.js": "48eb3ddee0d40664af79f026d862b9fd",
 "manifest.json": "dbdbc9356e82e8479572ab3c7c565cd2"};
 // The application shell files that are downloaded before a service worker can
 // start.
