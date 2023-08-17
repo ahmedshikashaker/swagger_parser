@@ -10,39 +10,32 @@ import '../models/universal_rest_client.dart';
 import '../models/universal_type.dart';
 
 /// Provides template for generating dart Retrofit client
-String dartRetrofitClientTemplate({
+String dartRepositoryClientTemplate({
   required UniversalRestClient restClient,
   required String name,
 }) {
   final sb = StringBuffer(
     '''
-${_fileImport(restClient)}import 'package:dio/dio.dart';
-import 'package:retrofit/retrofit.dart';
+${_fileImport(restClient)}import 'package:dartz/dartz.dart';
+import 'package:kib_core/kib_core.dart';
 import 'package:common_dependencies/common_dependencies.dart';
-${dartImports(imports: restClient.imports, pathPrefix: '../../models/')}
-part '${name.toSnake}.g.dart';
+${dartImports(imports: restClient.imports, pathPrefix: '../models/')}
 
-
-@RestApi()
-@injectable
-abstract class $name {
-  @factoryMethod
-  factory $name(Dio dio, {String baseUrl}) = _$name;
+abstract class ${name}Repository {
 ''',
   );
   for (final request in restClient.requests) {
-    sb.write(_toClientRequest(request));
+    sb.write(_toClientFunctions(request));
   }
   sb.write('}\n');
   return sb.toString();
 }
 
-String _toClientRequest(UniversalRequest request) {
+String _toClientFunctions(UniversalRequest request) {
   final sb = StringBuffer(
     '''
 
-  ${request.isMultiPart ? '@MultiPart()\n  ' : ''}${request.isFormUrlEncoded ? '@FormUrlEncoded()\n  ' : ''}@${request.requestType.name.toUpperCase()}('${request.route}')
-  Future<${request.returnType == null ? 'void' : request.returnType!.toSuitableType(ProgrammingLanguage.dart)}> ${request.name}(''',
+  Future<Either<AppExceptions,${request.returnType == null ? 'void' : request.returnType!.toSuitableType(ProgrammingLanguage.dart)}>> ${request.name}(''',
   );
   if (request.parameters.isNotEmpty) {
     sb.write('{\n');
@@ -64,20 +57,19 @@ String _toClientRequest(UniversalRequest request) {
 String _fileImport(UniversalRestClient restClient) => restClient.requests.any(
       (r) => r.parameters.any(
         (e) => e.type.toSuitableType(ProgrammingLanguage.dart) == 'File',
-      ),
-    )
-        ? "import 'dart:io';\n\n"
-        : '';
+  ),
+)
+    ? "import 'dart:io';\n\n"
+    : '';
 
 String _toParameter(UniversalRequestType parameter) =>
-    "    @${parameter.parameterType.type}(${parameter.name != null ? "${parameter.parameterType.isPart ? 'name: ' : ''}'${parameter.name}'" : ''}) "
-    '${parameter.type.isRequired && parameter.type.defaultValue == null ? 'required ' : ''}'
-    '${parameter.type.toSuitableType(ProgrammingLanguage.dart)} '
-    '${parameter.type.name!.toCamel}${_d(parameter.type)},';
+    '    ${parameter.type.isRequired && parameter.type.defaultValue == null ? 'required ' : ''}'
+        '${parameter.type.toSuitableType(ProgrammingLanguage.dart)} '
+        '${parameter.type.name!.toCamel}${_d(parameter.type)},';
 
 /// return defaultValue if have
 String _d(UniversalType t) => t.defaultValue != null
     ? ' = ${t.type.quoterForStringType()}'
-        '${t.enumType != null ? '${t.type}.${prefixForEnumItems(t.enumType!, t.defaultValue!)}' : t.defaultValue}'
-        '${t.type.quoterForStringType()}'
+    '${t.enumType != null ? '${t.type}.${prefixForEnumItems(t.enumType!, t.defaultValue!)}' : t.defaultValue}'
+    '${t.type.quoterForStringType()}'
     : '';

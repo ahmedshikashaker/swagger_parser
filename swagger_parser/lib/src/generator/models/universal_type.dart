@@ -86,6 +86,19 @@ extension UniversalTypeX on UniversalType {
     return sb.toString();
   }
 
+  String toSuitableListTestType(ProgrammingLanguage lang) {
+    final sb = StringBuffer();
+    for (var i = 1; i < arrayDepth; i++) {
+      sb.write('List<');
+    }
+    sb.write(_questionMark(lang));
+    for (var i = 1; i < arrayDepth; i++) {
+      sb.write('>');
+    }
+    return sb.toString();
+  }
+
+
   String _questionMark(ProgrammingLanguage lang) {
     final questionMark =
         isRequired && !nullable || arrayDepth > 0 || defaultValue != null

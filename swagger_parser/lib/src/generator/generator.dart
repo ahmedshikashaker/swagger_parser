@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import '../config/yaml_config.dart';
@@ -160,10 +161,31 @@ class Generator {
     );
     final files = <GeneratedFile>[];
     for (final client in _restClients) {
-      files.add(fillController.fillRestClientContent(client));
+      files
+        ..add(fillController.fillRestClientContent(client))
+        ..add(fillController.fillDataSourceClientContent(client))
+        ..add(fillController.fillDataSourceImplClientContent(client))
+        ..add(fillController.fillRepositoryClientContent(client))
+        ..add(fillController.fillRepositoryImplClientContent(client))
+        ..addAll(fillController.fillUseCasesClientContent(client))
+        ..add(fillController.fillStateClientContent(client))
+        ..add(fillController.fillCubitClientContent(client))
+        ..addAll(fillController.fillTestDataSourcesClientContent(client))
+        ..addAll(fillController.fillTestRepositoryClientContent(client))
+        ..addAll(fillController.fillTestUseCasesClientContent(client))
+        ..addAll(fillController.fillTestCubitClientContent(client));
     }
     for (final dataClass in _dataClasses) {
-      files.add(fillController.fillDtoContent(dataClass));
+      files.add(
+        fillController.fillDtoContent(
+          dataClass,
+          _restClients
+              .firstWhereOrNull(
+                (element) => element.imports.contains(dataClass.name),
+              )
+              ?.name,
+        ),
+      );
     }
     if (_rootInterface && _programmingLanguage == ProgrammingLanguage.dart) {
       files.add(fillController.fillRootInterface(_restClients));

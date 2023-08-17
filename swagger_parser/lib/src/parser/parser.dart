@@ -416,23 +416,26 @@ class OpenApiParser {
   /// to list of [UniversalDataClass]
   Iterable<UniversalDataClass> parseDataClasses() {
     final dataClasses = <UniversalDataClass>[];
-    late final Map<String, dynamic> entities;
+    late final Map<String, dynamic>? entities;
     if (_version == OpenApiVersion.v3_1 || _version == OpenApiVersion.v3) {
       if (!_definitionFileContent.containsKey(_componentsConst) ||
           !(_definitionFileContent[_componentsConst] as Map<String, dynamic>)
               .containsKey(_schemasConst)) {
         return dataClasses;
       }
-      entities = (_definitionFileContent[_componentsConst]
-          as Map<String, dynamic>)[_schemasConst] as Map<String, dynamic>;
+      final myEntries = (_definitionFileContent[_componentsConst]
+          as Map<String, dynamic>)[_schemasConst] as Map<String, dynamic>?;
+      entities = myEntries;
+      print(myEntries);
     } else if (_version == OpenApiVersion.v2) {
       if (!_definitionFileContent.containsKey(_definitionsConst)) {
         return dataClasses;
       }
       entities =
-          _definitionFileContent[_definitionsConst] as Map<String, dynamic>;
+          _definitionFileContent[_definitionsConst] as Map<String, dynamic>?;
     }
-    entities.forEach((key, value) {
+
+    entities?.forEach((key, value) {
       var requiredParameters = <String>[];
       if ((value as Map<String, dynamic>).containsKey(_requiredConst)) {
         requiredParameters = (value[_requiredConst] as List<dynamic>)
@@ -447,6 +450,9 @@ class OpenApiParser {
       void findParamsAndImports(Map<String, dynamic> map) {
         (map[_propertiesConst] as Map<String, dynamic>).forEach(
           (propertyName, propertyValue) {
+            if(propertyValue == null){
+              print(propertyValue);
+            }
             final typeWithImport = _findType(
               propertyValue as Map<String, dynamic>,
               name: propertyName,
@@ -617,13 +623,13 @@ class OpenApiParser {
   }) {
     if (map.containsKey(_typeConst) && map[_typeConst] == _arrayConst) {
       // `array`
-      final arrayItems = map[_itemsConst] as Map<String, dynamic>;
+      final arrayItems = map[_itemsConst] as Map<String, dynamic>?;
       final arrayType = _findType(
-        arrayItems,
+        arrayItems??{},
         arrayName: name,
         root: false,
       );
-      final arrayValueNullable = arrayItems[_nullableConst].toString().toBool();
+      final arrayValueNullable = arrayItems?[_nullableConst].toString().toBool()??true;
       final type = '${arrayType.type.type}${arrayValueNullable ? '?' : ''}';
       return TypeWithImport(
         type: UniversalType(

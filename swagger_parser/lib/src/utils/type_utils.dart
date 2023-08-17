@@ -34,6 +34,17 @@ extension StringTypeX on String {
     return this;
   }
 
+  bool isCustomDartType([String? format]) {
+    switch (this) {
+      case 'integer':
+      case 'string':
+      case 'boolean':
+      case 'number':
+        return false;
+    }
+    return true;
+  }
+
   String toKotlinType([String? format]) {
     switch (this) {
       case 'integer':

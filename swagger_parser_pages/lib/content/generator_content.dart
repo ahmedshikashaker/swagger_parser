@@ -2,6 +2,7 @@ import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
 import 'package:swagger_parser/swagger_parser.dart';
+import 'package:swagger_parser_pages/utils/chatgpt_api.dart';
 import 'package:swagger_parser_pages/utils/file_utils.dart';
 
 class GeneratorContent extends StatefulWidget {
@@ -197,8 +198,13 @@ Future<void> _generateOutputs(
   required bool isYaml,
   required bool rootInterface,
 }) async {
+  var content= schema;
+  if(isURL(schema)) {
+    content = await getSwaggerJson(schema);
+  }
+
   final generator = Generator.fromString(
-    schemaContent: schema,
+    schemaContent: content,
     language: language,
     clientPostfix: clientPostfix.trim().isEmpty ? null : clientPostfix,
     freezed: freezed,
