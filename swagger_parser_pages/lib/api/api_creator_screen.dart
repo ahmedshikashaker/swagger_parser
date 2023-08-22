@@ -32,17 +32,15 @@ class _State extends State<APICreatorScreen> {
   final CodeController _responseController = CodeController(
     language: json,
   );
+  final    GroupButtonController? buttonsController = GroupButtonController();
 
   ApiGeneratorOutput? apiGeneratorOutput;
 
 
-
-  APIMethodType? methodType;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _buildBody());
+        body: _buildBody(),);
   }
 
   Widget _buildBody() {
@@ -85,7 +83,7 @@ class _State extends State<APICreatorScreen> {
                           modelName: _modelTextEditingController.text,
                           request: _requestController.text,
                           response: _responseController.text,
-                          apiMethod: methodType??APIMethodType.get,
+                          apiMethod: APIMethodType.values[buttonsController?.selectedIndex??1],
                           serviceName: _endpointTextEditingController.text,
                         ).then((value) async {
                               setState(() {
@@ -128,7 +126,7 @@ class _State extends State<APICreatorScreen> {
               padding: const EdgeInsets.all(8.0),
               child: GroupButton(
                   maxSelected: 1,
-                  isRadio: false,
+                  controller: buttonsController,
                   options: const GroupButtonOptions(
                     alignment: Alignment.center,
                     textPadding: EdgeInsets.all(10),
@@ -136,9 +134,6 @@ class _State extends State<APICreatorScreen> {
                     selectedBorderColor: Colors.green,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  onSelected: (String value, int index, bool isSelected) {
-                    methodType = getMethodFromString(value);
-                  },
                   buttons: APIMethodType.values
                       .toList()
                       .map((e) => e.getName())
@@ -160,7 +155,7 @@ class _State extends State<APICreatorScreen> {
           controller: _modelTextEditingController,
           autofocus: false,
           decoration: const InputDecoration(
-              label: Text('Model class name'),
+              label: Text('Service name'),
               contentPadding: EdgeInsets.all(10)),
         ),
       ),
@@ -213,19 +208,4 @@ class _State extends State<APICreatorScreen> {
     );
   }
 
-  APIMethodType getMethodFromString(String method) {
-    switch (method) {
-      case 'POST':
-        return APIMethodType.post;
-      case 'GET':
-        return APIMethodType.get;
-      case 'PUT':
-        return APIMethodType.put;
-      case 'UPDATE':
-        return APIMethodType.update;
-      case 'DELETE':
-        return APIMethodType.delete;
-    }
-    return APIMethodType.post;
-  }
 }

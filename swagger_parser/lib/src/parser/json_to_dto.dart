@@ -1,18 +1,24 @@
 import 'dart:convert';
 
+import '../utils/case_utils.dart';
+
 ///json_to_dto extension on String
 extension JsonToDTOStrings on String {
   ///Converts a JSON string to a Dart PODO DTO class. This assumes that the JSON string
   ///is a valid JSON object. If it is not, an exception will be thrown.
   JsonDtoOutputModel toDtoDart([String className = 'Root']) {
-    final dynamic jsonData =  jsonDecode(this);
-    if(jsonData is List<dynamic>){
-      final content =  ( jsonData.first as Map<String, dynamic>).toDtoDart(className);
-      return JsonDtoOutputModel(content , true);
-    }else{
-      final content = ( json as Map<String, dynamic>).toDtoDart(className);
-      return JsonDtoOutputModel(content , false);
+    if (isNotEmpty) {
+      final dynamic jsonData = jsonDecode(this);
+      if (jsonData is List<dynamic>) {
+        final content = (jsonData.first as Map<String, dynamic>).toDtoDart(
+            className);
+        return JsonDtoOutputModel(content, true);
+      } else {
+        final content = (jsonData as Map<String, dynamic>).toDtoDart(className);
+        return JsonDtoOutputModel(content, false);
+      }
     }
+    return JsonDtoOutputModel('', false);
   }
 }
 
@@ -25,9 +31,9 @@ extension JsonMapExtension on Map<String, dynamic> {
     final generatedClasses = <String>{};
     buffer
       ..writeln('''import 'package:json_annotation/json_annotation.dart'; ''')
-      ..writeln('''part '${className.toLowerCase()}.g.dart'; ''')
+      ..writeln('''part '${className.toSnake}.g.dart'; ''')
       ..writeln();
-    _generateClass(buffer, className, this, generatedClasses);
+    _generateClass(buffer, className.toPascal, this, generatedClasses);
 
     return buffer.toString();
   }

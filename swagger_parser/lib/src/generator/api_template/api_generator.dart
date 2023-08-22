@@ -1,4 +1,6 @@
-
+import 'package:swagger_parser/src/generator/api_template/api_remote_datasource_impl_template.dart';
+import 'package:swagger_parser/src/generator/api_template/api_repository_impl_template.dart';
+import 'package:swagger_parser/src/generator/api_template/api_usecase_template.dart';
 
 import '../../../swagger_parser.dart';
 import '../../utils/case_utils.dart';
@@ -6,68 +8,158 @@ import 'api_remote_datasource_template.dart';
 import 'api_repository_template.dart';
 import 'api_service_code_template.dart';
 
-
 class APIGenerator {
-
   APIGenerator();
 
-  Future<ApiGeneratorOutput> generateAPICall({required String modelName,
+  Future<ApiGeneratorOutput> generateAPICall({
+    required String modelName,
     required String request,
     required String response,
     required APIMethodType apiMethod,
-    required String serviceName,}) async {
+    required String serviceName,
+  }) async {
     final serviceString = await generateServiceFiles(
-        serviceName: serviceName,
-        method: apiMethod,
-        modelName: modelName,
-        response: response.toDtoDart(),);
+      serviceName: serviceName,
+      method: apiMethod,
+      modelName: modelName,
+      response: response.toDtoDart(),
+    );
 
     final modelString = _generateModels(
-        modelName: modelName, json: response,);
+      modelName: modelName,
+      json: response,
+    );
     String? requestString;
     if (request.isNotEmpty) {
       requestString = _generateModels(
-          modelName: '${modelName.toPascal}Request', json: request,);
+        modelName: '${modelName.toPascal}Request',
+        json: request,
+      );
     }
 
     return ApiGeneratorOutput(
-        serviceCode: serviceString,
-        modelCode: modelString,
-        repositoryCode: generateRepositoryCode(
-            modelName: modelName,
-            apiMethod: apiMethod,
-            response: response.toDtoDart(),
-            requestModelName: '${modelName}_request',),
-        dataSourceCode: generateDataSourceCode(
-            modelName: modelName,
-            apiMethod: apiMethod,
-            response: response.toDtoDart(),
-            requestModelName: '${modelName}_request',),
-        requestCode: requestString,);
+      serviceCode: serviceString,
+      modelCode: modelString,
+      repositoryCode: generateRepositoryCode(
+        modelName: modelName,
+        serviceName: serviceName,
+        apiMethod: apiMethod,
+        response: response.toDtoDart(),
+        requestModelName: '${modelName}_request',
+      ),
+      repositoryImplCode: generateRepositoryImplCode(
+        modelName: modelName,
+        serviceName: serviceName,
+        apiMethod: apiMethod,
+        response: response.toDtoDart(),
+        requestModelName: '${modelName}_request',
+      ),
+      dataSourceCode: generateDataSourceCode(
+        modelName: modelName,
+        serviceName: serviceName,
+        apiMethod: apiMethod,
+        response: response.toDtoDart(),
+        requestModelName: '${modelName}_request',
+      ),
+      dataSourceImplCode: generateDataSourceImplCode(
+        modelName: modelName,
+        serviceName: serviceName,
+        apiMethod: apiMethod,
+        response: response.toDtoDart(),
+        requestModelName: '${modelName}_request',
+      ),
+      useCaseCode: generateUseCaseFiles(
+        modelName: modelName,
+        serviceName: serviceName,
+        method: apiMethod,
+        response: response.toDtoDart(),
+        requestModelName: '${modelName}_request',
+      ),
+      requestCode: requestString,
+    );
   }
 
-  String _generateModels(
-      {required String modelName, required String json,}) {
-    return json.toDtoDart(modelName).content;
+  String _generateModels({
+    required String modelName,
+    required String json,
+  }) {
+    if (json.isNotEmpty) {
+      return json.toDtoDart(modelName).content;
+    }
+    return '';
   }
+}
 
+String getReturnDataModel(String modelName, JsonDtoOutputModel response) {
+  if (response.content.isNotEmpty) {
+    var serviceReturnModel = modelName.toPascal;
+    if (response.isArray) {
+      serviceReturnModel = 'List<${modelName.toPascal}>';
+    }
+    return serviceReturnModel;
   }
+  return 'void';
+}
+
+String buildPathParameters(String serviceName) {
+  final bf = StringBuffer();
+  final paths = serviceName.split('/');
+  for (final path in paths) {
+    if (path.startsWith('{') && path.endsWith('}')) {
+      final cleanPath = path.replaceAll('{', '').replaceAll('}', '');
+      bf.writeln('''required String $cleanPath,''');
+    }
+  }
+  return bf.toString();
+}
+
+String buildServicePathParameters(String serviceName) {
+  final bf = StringBuffer();
+  final paths = serviceName.split('/');
+  for (final path in paths) {
+    if (path.startsWith('{') && path.endsWith('}')) {
+      final cleanPath = path.replaceAll('{', '').replaceAll('}', '');
+      bf.writeln('''@Path("$cleanPath") required String $cleanPath,''');
+    }
+  }
+  return bf.toString();
+}
+
+String buildPathParametersValue(String serviceName) {
+  final bf = StringBuffer();
+  final paths = serviceName.split('/');
+  for (final path in paths) {
+    if (path.startsWith('{') && path.endsWith('}')) {
+      final cleanPath = path.replaceAll('{', '').replaceAll('}', '');
+      bf.writeln('''$cleanPath:$cleanPath,''');
+    }
+  }
+  return bf.toString();
+}
+
 class ApiGeneratorOutput {
+  ApiGeneratorOutput({
+    required this.serviceCode,
+    required this.modelCode,
+    required this.dataSourceCode,
+    required this.repositoryCode,
+    this.requestCode,
+    this.dataSourceImplCode,
+    this.repositoryImplCode,
+    this.useCaseCode,
+  });
 
-  ApiGeneratorOutput(
-      {required this.serviceCode,
-      required this.modelCode,
-      required this.dataSourceCode,
-      required this.repositoryCode,
-      this.requestCode,});
   String serviceCode;
   String modelCode;
   String? requestCode;
   String dataSourceCode;
+  String? dataSourceImplCode;
   String repositoryCode;
+  String? repositoryImplCode;
+  String? useCaseCode;
 }
 
-enum APIMethodType { post, get, update, put, delete }
+enum APIMethodType { post, get, update, patch, put, delete }
 
 extension APIMethodTypeEx on APIMethodType {
   String getName() {
@@ -82,18 +174,34 @@ extension APIMethodTypeEx on APIMethodType {
         return 'UPDATE';
       case APIMethodType.delete:
         return 'DELETE';
+      case APIMethodType.patch:
+        return 'PATCH';
+    }
+  }
+
+  String getFunctionName() {
+    switch (this) {
+      case APIMethodType.post:
+        return 'POST';
+      case APIMethodType.get:
+        return 'GET';
+      case APIMethodType.put:
+      case APIMethodType.update:
+      case APIMethodType.patch:
+        return 'UPDATE';
+      case APIMethodType.delete:
+        return 'DELETE';
     }
   }
 
   bool hasBody() {
     switch (this) {
-      case APIMethodType.post:
-        return true;
       case APIMethodType.get:
         return false;
       case APIMethodType.put:
-        return true;
       case APIMethodType.update:
+      case APIMethodType.post:
+      case APIMethodType.patch:
         return true;
       case APIMethodType.delete:
         return false;

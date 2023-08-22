@@ -4,24 +4,25 @@ import '../../utils/case_utils.dart';
 import 'api_generator.dart';
 
 String generateDataSourceCode(
-    {required String modelName,
+    {required String serviceName,
+      required String modelName,
       required APIMethodType apiMethod,
       required JsonDtoOutputModel response,
 
       required String requestModelName}) {
 
-  var serviceReturnModel = modelName.toPascal;
-  if(response.isArray){
-    serviceReturnModel = 'List<${modelName.toPascal}>';
-  }
-
-
+  final serviceReturnModel  = getReturnDataModel(modelName , response);
 
   return '''
-  @override
-  Future<$serviceReturnModel> ${apiMethod.getName().toCamel}${modelName.toCamel}(${apiMethod.hasBody() ? '${requestModelName.toCamel} ${requestModelName.toCamel}' : ""}) async {
-   return await _service.${apiMethod.getName().toCamel}${modelName.toCamel}(${apiMethod.hasBody() ? '${requestModelName.toPascal} ${requestModelName.toPascal}' : ""});
-  }
-    ''';
+import 'package:injectable/injectable.dart';
+import '../../../data/models/${modelName.toSnake}.dart';
+${apiMethod.hasBody() ? "{import '../../../data/models/${modelName.toSnake}_request.dart';" : ""}
+      
+abstract class ${modelName.toPascal}RemoteDataSource {
+
+  Future<$serviceReturnModel> ${apiMethod.getFunctionName().toCamel}${modelName.toPascal}(${apiMethod.hasBody() ? '{required ${requestModelName.toCamel} ${requestModelName.toCamel},${buildPathParameters(serviceName)}}' : "{${buildPathParameters(serviceName)}}"}); 
+  
+}  
+''';
 }
 

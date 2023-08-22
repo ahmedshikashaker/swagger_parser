@@ -5,30 +5,26 @@ import '../../utils/case_utils.dart';
 import 'api_generator.dart';
 
 String generateRepositoryCode({required String modelName,
+  required String serviceName,
   required APIMethodType apiMethod,
   required JsonDtoOutputModel response,
   required String requestModelName}) {
-  var serviceReturnModel = modelName.toPascal;
-  if (response.isArray) {
-    serviceReturnModel = 'List<${modelName.toPascal}>';
-  }
+  final serviceReturnModel  = getReturnDataModel(modelName , response);
 
   return '''
-     @override
+
+import 'package:injectable/injectable.dart';
+import '../../../data/models/${modelName.toSnake}.dart';
+${apiMethod.hasBody() ? "{import '../../../data/models/${modelName.toSnake}_request.dart';" : ""}
+  
+  
+@injectable  
+abstract class ${modelName.toPascal}Repository{
+
   Future<Either<AppExceptions, $serviceReturnModel>> ${apiMethod
-      .getName().toCamel}${modelName.toPascal}(${apiMethod.hasBody()
-      ? '${requestModelName.toPascal} ${requestModelName.toCamel}'
-      : ""}) async {
-    try {
-      return right(await remoteDataSource.${apiMethod
-      .getName().toCamel}${modelName.toPascal}(${apiMethod.hasBody()
-      ? '${requestModelName.toPascal} ${requestModelName.toCamel}'
-      : ""}));
-    } on Exception catch (error) {
-      return left( AppExceptions.remote(
-          message: "error fetching ${modelName.toPascal} data", statusCode: "-1"));
-    }
-  }
+      .getFunctionName().toCamel}${modelName.toPascal}(${apiMethod.hasBody()
+      ? '{required ${requestModelName.toCamel} ${requestModelName.toCamel},${buildPathParameters(serviceName)}}' : "{${buildPathParameters(serviceName)}}"}); 
+}  
     ''';
 }
 

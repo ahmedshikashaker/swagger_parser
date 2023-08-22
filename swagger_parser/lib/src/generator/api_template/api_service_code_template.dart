@@ -9,13 +9,11 @@ Future<String> generateServiceFiles(
       required JsonDtoOutputModel response,
       required APIMethodType method}) async {
 
-  var serviceReturnModel = modelName.toPascal;
-  if(response.isArray){
-    serviceReturnModel = 'List<${modelName.toPascal}>';
-  }
+  final serviceReturnModel  = getReturnDataModel(modelName , response);
 
 
   final template = '''
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import '../../../data/models/${modelName.toSnake}.dart';
@@ -31,9 +29,11 @@ abstract class ${modelName.toPascal}Service{
   factory ${modelName.toPascal}Service(Dio dio) = _${modelName.toPascal}Service;
 
   @${method.getName()}("$serviceName")
-  Future<$serviceReturnModel> ${method.getName().toCamel}${modelName.toCamel.replaceAll("Response", '')}(${method.hasBody() ? '@Body() ${modelName}Request request' : ''});
+  Future<$serviceReturnModel> ${method.getFunctionName().toCamel}${modelName.toPascal.replaceAll("Response", '')}(${method.hasBody() ? '{@Body() required ${modelName}Request ${modelName.toCamel}Request,${buildServicePathParameters(serviceName)}}' : '{${buildServicePathParameters(serviceName)}}'});
 }
     ''';
 
   return template;
 }
+
+
