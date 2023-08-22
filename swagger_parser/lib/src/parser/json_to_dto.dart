@@ -4,9 +4,18 @@ import 'dart:convert';
 extension JsonToDTOStrings on String {
   ///Converts a JSON string to a Dart PODO DTO class. This assumes that the JSON string
   ///is a valid JSON object. If it is not, an exception will be thrown.
-  String toDtoDart([String className = 'Root']) =>
-      (jsonDecode(this) as Map<String, dynamic>).toDtoDart(className);
+  JsonDtoOutputModel toDtoDart([String className = 'Root']) {
+    final dynamic jsonData =  jsonDecode(this);
+    if(jsonData is List<dynamic>){
+      final content =  ( jsonData.first as Map<String, dynamic>).toDtoDart(className);
+      return JsonDtoOutputModel(content , true);
+    }else{
+      final content = ( json as Map<String, dynamic>).toDtoDart(className);
+      return JsonDtoOutputModel(content , false);
+    }
+  }
 }
+
 
 ///json_to_dto extension on String
 extension JsonMapExtension on Map<String, dynamic> {
@@ -25,11 +34,11 @@ extension JsonMapExtension on Map<String, dynamic> {
 }
 
 void _generateClass(
-  StringBuffer buffer,
-  String className,
-  Map<String, dynamic> jsonMap,
-  Set<String> generatedClasses,
-) {
+    StringBuffer buffer,
+    String className,
+    Map<String, dynamic> jsonMap,
+    Set<String> generatedClasses,
+    ) {
   if (generatedClasses.contains(className)) return;
 
   generatedClasses.add(className);
@@ -50,7 +59,7 @@ void _generateClass(
     ..writeAll(jsonMap.entries.map((e) => 'this.${e.key}, '))
     ..writeln('});')
     ..writeln()
-    // fromJson factory method
+  // fromJson factory method
     ..writeln()
     ..writeln('  factory $className.fromJson(Map<String, dynamic> json) =>')
     ..writeln('  _\$${className}FromJson(json);') // toJson method
@@ -109,3 +118,13 @@ String _getType(dynamic value, String key) {
 }
 
 String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
+///
+class JsonDtoOutputModel{
+  ///
+  JsonDtoOutputModel(this.content , this.isArray);
+  ///
+  final String content;
+  ///
+  final bool isArray;
+}

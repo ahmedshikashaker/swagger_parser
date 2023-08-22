@@ -17,6 +17,10 @@ dependencies:
   url_launcher: ^6.1.11
   dio: ^5.3.2
   highlight: ^0.7.0
+  code_text_field: ^1.1.0
+  flutter_highlight: ^0.7.0
+  group_button: ^5.3.2
+
 
 
 

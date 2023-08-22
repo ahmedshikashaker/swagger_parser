@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swagger_parser_pages/content/main_page.dart';
+import 'package:swagger_parser_pages/api/api_creator_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -10,10 +10,10 @@ class App extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorSchemeSeed: const Color(0xFFD0BCFF),
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.dark,
-        home: const MainPage(),
+        themeMode: ThemeMode.light,
+        home: const APICreatorScreen(),
       );
 }
