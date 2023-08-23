@@ -1,5 +1,5 @@
 name: swagger_parser_pages
-description: Web interface for swagger_parser
+description: Web interface for Development Kit
 publish_to: none
 version: 1.0.0+1
 environment:
