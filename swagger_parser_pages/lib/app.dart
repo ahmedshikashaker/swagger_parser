@@ -13,7 +13,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-        title: 'Swagger Parser',
+        title: 'Development kit',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorSchemeSeed: const Color(0xFFD0BCFF),
