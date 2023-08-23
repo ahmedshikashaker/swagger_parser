@@ -213,8 +213,6 @@ Future<void> _generateOutputs(
     rootInterface: rootInterface,
   );
   try {
-    final module = await ModuleGenerator.generateModule('MultiCurrency');
-    generateModuleArchive(module , 'MultiCurrency');
     final files = await generator.generateContent();
     generateArchive(files);
   } on Object catch (e) {
