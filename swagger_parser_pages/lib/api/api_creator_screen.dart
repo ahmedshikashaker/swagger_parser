@@ -150,7 +150,7 @@ class _State extends State<APICreatorScreen> {
       height: 76,
       width: 400,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: TextField(
           controller: _modelTextEditingController,
           autofocus: false,
@@ -167,7 +167,7 @@ class _State extends State<APICreatorScreen> {
       height: 76,
       width: 400,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: TextField(
           controller: _endpointTextEditingController,
           autofocus: false,

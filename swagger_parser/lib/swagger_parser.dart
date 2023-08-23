@@ -6,6 +6,7 @@ export 'package:swagger_parser/src/parser/json_to_dto.dart';
 
 export 'src/generator/api_template/api_generator.dart';
 export 'src/generator/generator.dart';
+export 'src/generator/localization/localization_generator.dart';
 export 'src/generator/models/generated_file.dart';
 export 'src/generator/models/programming_lang.dart';
 export 'src/generator/module_template/module_generator.dart';

@@ -35,8 +35,7 @@ void generateArchive(List<GeneratedFile> files) {
   html.Url.revokeObjectUrl(url);
 }
 
-
-void generateModuleArchive(Archive archive , String moduleName) {
+void generateModuleArchive(Archive archive, String moduleName) {
   final encoder = ZipEncoder();
   final outputStream = OutputStream();
   final bytes = encoder.encode(
@@ -48,7 +47,7 @@ void generateModuleArchive(Archive archive , String moduleName) {
   final blob = html.Blob(<List<int>?>[bytes]);
   final url = html.Url.createObjectUrlFromBlob(blob);
   final anchor = html.document.createElement('a') as html.AnchorElement
-  // ignore: unsafe_html
+    // ignore: unsafe_html
     ..href = url
     ..style.display = 'none'
     ..download = '$moduleName.zip';
@@ -62,3 +61,32 @@ void generateModuleArchive(Archive archive , String moduleName) {
   html.Url.revokeObjectUrl(url);
 }
 
+void generateLocalizationArchive(String content, String fileName) {
+  final encoder = ZipEncoder();
+
+  final archive = Archive()
+    ..addFile(ArchiveFile('resources/$fileName.dart', content.length, content));
+
+  final outputStream = OutputStream();
+  final bytes = encoder.encode(
+    archive,
+    level: Deflate.BEST_COMPRESSION,
+    output: outputStream,
+  );
+
+  final blob = html.Blob(<List<int>?>[bytes]);
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  final anchor = html.document.createElement('a') as html.AnchorElement
+    // ignore: unsafe_html
+    ..href = url
+    ..style.display = 'none'
+    ..download = '$fileName.zip';
+  html.document.body!.children.add(anchor);
+
+  // download
+  anchor.click();
+
+  // cleanup
+  html.document.body!.children.remove(anchor);
+  html.Url.revokeObjectUrl(url);
+}
