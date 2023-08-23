@@ -19,6 +19,7 @@ class _ModuleCreationScreenState extends State<ModuleCreationScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 36,),
             Row(
               children: [
                 _createModuleInput(),
@@ -30,7 +31,7 @@ class _ModuleCreationScreenState extends State<ModuleCreationScreen> {
                     onPressed:  () async {
                             final module = await ModuleGenerator.generateModule(
                                 moduleGenerationController.text,);
-                            generateModuleArchive(module, moduleGenerationController.text);
+                            generateFeatureOrModuleArchive(module, moduleGenerationController.text);
                           },
                     child: const Text('Generate Module'),
                   ),
@@ -48,7 +49,11 @@ class _ModuleCreationScreenState extends State<ModuleCreationScreen> {
                   height: 40,
                   width: 300,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final module = await FeatureGenerator.generateFeature(
+                        featureGenerationController.text,);
+                      generateFeatureOrModuleArchive(module, featureGenerationController.text);
+                    },
                     child: const Text('Generate Feature'),
                   ),
                 )
@@ -69,6 +74,8 @@ class _ModuleCreationScreenState extends State<ModuleCreationScreen> {
         child: TextField(
           controller: moduleGenerationController,
           decoration: const InputDecoration(
+              filled: true,
+
               label: Text('Module Name'), contentPadding: EdgeInsets.all(10)),
         ),
       ),
@@ -84,6 +91,7 @@ class _ModuleCreationScreenState extends State<ModuleCreationScreen> {
         child: TextField(
           controller: featureGenerationController,
           decoration: const InputDecoration(
+              filled: true,
               label: Text('Feature Name'), contentPadding: EdgeInsets.all(10),),
         ),
       ),

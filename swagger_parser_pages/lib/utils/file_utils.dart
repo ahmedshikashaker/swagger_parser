@@ -35,7 +35,7 @@ void generateArchive(List<GeneratedFile> files) {
   html.Url.revokeObjectUrl(url);
 }
 
-void generateModuleArchive(Archive archive, String moduleName) {
+void generateFeatureOrModuleArchive(Archive archive, String moduleName) {
   final encoder = ZipEncoder();
   final outputStream = OutputStream();
   final bytes = encoder.encode(

@@ -5,6 +5,7 @@ library swagger_parser;
 export 'package:swagger_parser/src/parser/json_to_dto.dart';
 
 export 'src/generator/api_template/api_generator.dart';
+export 'src/generator/feature_template/feature_generator.dart';
 export 'src/generator/generator.dart';
 export 'src/generator/localization/localization_generator.dart';
 export 'src/generator/models/generated_file.dart';
