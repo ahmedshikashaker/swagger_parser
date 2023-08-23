@@ -28,70 +28,64 @@ class _GeneratorContentState extends State<GeneratorContent> {
     crossAxisAlignment: WrapCrossAlignment.center,
     runSpacing: 20,
     children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: CodeEditorWidget(
-          title: 'Paste your Swagger Link , OpenApi JSON or YAML file content in the textarea below, '
-              'click "Generate and download" and get your generated files in zip archive.',
-          codeController: swaggerController,
-        ),
+      CodeEditorWidget(
+        title: 'Paste your Swagger Link , OpenApi JSON or YAML file content in the textarea below, '
+            'click "Generate and download" and get your generated files in zip archive.',
+        codeController: swaggerController,
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              StatefulBuilder(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            StatefulBuilder(
+              builder: (context, setState) => CheckboxListTile(
+                title: const Text('Is YAML file content'),
+                value: _isYaml,
+                onChanged: (value) => setState(() => _isYaml = value!),
+              ),
+            ),
+            const SizedBox(height: 16),
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 600),
+              crossFadeState: _language == ProgrammingLanguage.dart
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              sizeCurve: Curves.fastOutSlowIn,
+              // for correct animation
+              firstChild: Container(),
+              secondChild: StatefulBuilder(
                 builder: (context, setState) => CheckboxListTile(
-                  title: const Text('Is YAML file content'),
-                  value: _isYaml,
-                  onChanged: (value) => setState(() => _isYaml = value!),
+                  title: const Text('Use freezed for models'),
+                  value: _freezed,
+                  onChanged: (value) =>
+                      setState(() => _freezed = value!),
                 ),
               ),
-              const SizedBox(height: 16),
-              AnimatedCrossFade(
-                duration: const Duration(milliseconds: 600),
-                crossFadeState: _language == ProgrammingLanguage.dart
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                sizeCurve: Curves.fastOutSlowIn,
-                // for correct animation
-                firstChild: Container(),
-                secondChild: StatefulBuilder(
-                  builder: (context, setState) => CheckboxListTile(
-                    title: const Text('Use freezed for models'),
-                    value: _freezed,
-                    onChanged: (value) =>
-                        setState(() => _freezed = value!),
-                  ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              child: ElevatedButton(
+                child: const Text(
+                  'Generate and download',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 24),
                 ),
+                onPressed: () async {
+                  await _generateOutputs(
+                    context,
+                    schema: swaggerController.text,
+                    clientPostfix: '',
+                    language: _language,
+                    freezed: _freezed,
+                    squishClients: _squishClients,
+                    isYaml: _isYaml,
+                    rootInterface: _rootInterface,
+                  );
+                },
               ),
-              const SizedBox(height: 32),
-              SizedBox(
-                child: OutlinedButton(
-                  child: const Text(
-                    'Generate and download',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  onPressed: () async {
-                    await _generateOutputs(
-                      context,
-                      schema: swaggerController.text,
-                      clientPostfix: '',
-                      language: _language,
-                      freezed: _freezed,
-                      squishClients: _squishClients,
-                      isYaml: _isYaml,
-                      rootInterface: _rootInterface,
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       )
     ],

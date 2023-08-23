@@ -25,6 +25,7 @@ class CodeEditorWidget extends StatelessWidget {
                   data: const CodeThemeData(styles: monokaiSublimeTheme),
                   child: CodeField(
                     controller: codeController,
+
                     textStyle: const TextStyle(fontFamily: 'SourceCode'),
                   ),
                 ),
