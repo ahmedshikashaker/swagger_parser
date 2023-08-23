@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:group_button/group_button.dart';
 import 'package:highlight/languages/json.dart';
 import 'package:swagger_parser/swagger_parser.dart';
 
 import 'package:swagger_parser_pages/api/api_generator_output.dart';
+import 'package:swagger_parser_pages/components/code_editor_widget.dart';
 
 // ignore: must_be_immutable
 class APICreatorScreen extends StatefulWidget {
@@ -54,10 +54,10 @@ class _State extends State<APICreatorScreen> {
             Row(
               children: [_createModelNameInput(), _createEndPointInput()],
             ),
-            _createJsonEditor(
+            CodeEditorWidget(
                 title: 'Request body:',
                 codeController: _requestController),
-            _createJsonEditor(
+            CodeEditorWidget(
                 title: 'Response:',
                 codeController: _responseController),
             const SizedBox(
@@ -175,36 +175,6 @@ class _State extends State<APICreatorScreen> {
               label: Text('API Endpoint'), contentPadding: EdgeInsets.all(10)),
         ),
       ),
-    );
-  }
-
-  Widget _createJsonEditor(
-      {required String title, required CodeController codeController}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(title),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                color: Colors.black.withOpacity(0.4),
-                child: CodeTheme(
-                  data: const CodeThemeData(styles: monokaiSublimeTheme),
-                  child: CodeField(
-                    controller: codeController,
-                    textStyle: const TextStyle(fontFamily: 'SourceCode'),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 

@@ -1,9 +1,9 @@
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:highlight/languages/json.dart';
 import 'package:swagger_parser/swagger_parser.dart';
+import 'package:swagger_parser_pages/components/code_editor_widget.dart';
 import 'package:swagger_parser_pages/utils/file_utils.dart';
 
 class LocalizationScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class _LocalizationScreenState extends State<LocalizationScreen> {
             const SizedBox(
               height: 24,
             ),
-            _createJsonEditor(
+            CodeEditorWidget(
                 title: 'Enter Localization Json',
                 codeController: _localizationJsonController),
             const SizedBox(
@@ -55,7 +55,7 @@ class _LocalizationScreenState extends State<LocalizationScreen> {
             const SizedBox(
               height: 24,
             ),
-            _createJsonEditor(
+            CodeEditorWidget(
                 title: 'Localization Generation Result',
                 codeController: _resultController,),
             const SizedBox(
@@ -64,35 +64,6 @@ class _LocalizationScreenState extends State<LocalizationScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _createJsonEditor(
-      {required String title, required CodeController codeController}) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(title),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                color: Colors.black.withOpacity(0.4),
-                child: CodeTheme(
-                  data: const CodeThemeData(styles: monokaiSublimeTheme),
-                  child: CodeField(
-                    controller: codeController,
-                    textStyle: const TextStyle(fontFamily: 'SourceCode'),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
