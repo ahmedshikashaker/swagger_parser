@@ -27,8 +27,11 @@ class _LocalizationScreenState extends State<LocalizationScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(
+              height: 24,
+            ),
             _createJsonEditor(
-                title: 'Localization Json',
+                title: 'Enter Localization Json',
                 codeController: _localizationJsonController),
             const SizedBox(
               height: 24,
@@ -54,7 +57,7 @@ class _LocalizationScreenState extends State<LocalizationScreen> {
             ),
             _createJsonEditor(
                 title: 'Localization Generation Result',
-                codeController: _resultController),
+                codeController: _resultController,),
             const SizedBox(
               height: 24,
             ),
