@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swagger_parser_pages/api/api_creator_screen.dart';
+import 'package:swagger_parser_pages/content/swagger_screen.dart';
 import 'package:swagger_parser_pages/localization/localization_screen.dart';
 import 'package:swagger_parser_pages/module/module_creation_screen.dart';
 
@@ -16,6 +17,6 @@ class App extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: ThemeMode.light,
-        home: const ModuleCreationScreen(),
+        home: const SwaggerScreen(),
       );
 }

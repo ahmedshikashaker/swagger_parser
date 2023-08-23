@@ -13,7 +13,7 @@ class CodeEditorWidget extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(title),
+          child: Text(title , style: Theme.of(context).typography.englishLike.headlineMedium,),
         ),
         Row(
           children: [
