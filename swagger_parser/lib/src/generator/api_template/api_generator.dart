@@ -17,18 +17,9 @@ class APIGenerator {
     required String response,
     required APIMethodType apiMethod,
     required String serviceName,
+    required List<String> queryParams
   }) async {
-    final serviceString = await generateServiceFiles(
-      serviceName: serviceName,
-      method: apiMethod,
-      modelName: modelName,
-      response: response.toDtoDart(),
-    );
 
-    final modelString = _generateModels(
-      modelName: modelName,
-      json: response,
-    );
     String? requestString;
     if (request.isNotEmpty) {
       requestString = _generateModels(
@@ -36,6 +27,21 @@ class APIGenerator {
         json: request,
       );
     }
+
+    final serviceString = await generateServiceFiles(
+      serviceName: serviceName,
+      method: apiMethod,
+      modelName: modelName,
+      response: response.toDtoDart(),
+      queryParams: queryParams,
+      hasBody: requestString!=null && requestString.isNotEmpty
+    );
+
+    final modelString = _generateModels(
+      modelName: modelName,
+      json: response,
+    );
+
 
     return ApiGeneratorOutput(
       serviceCode: serviceString,
@@ -46,6 +52,8 @@ class APIGenerator {
         apiMethod: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        queryParams: queryParams,
+        hasBody: requestString!=null && requestString.isNotEmpty
       ),
       repositoryImplCode: generateRepositoryImplCode(
         modelName: modelName,
@@ -53,6 +61,8 @@ class APIGenerator {
         apiMethod: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        queryParams: queryParams,
+        hasBody: requestString!=null && requestString.isNotEmpty
       ),
       dataSourceCode: generateDataSourceCode(
         modelName: modelName,
@@ -60,6 +70,9 @@ class APIGenerator {
         apiMethod: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        queryParams: queryParams,
+        hasBody: requestString!=null && requestString.isNotEmpty
+
       ),
       dataSourceImplCode: generateDataSourceImplCode(
         modelName: modelName,
@@ -67,6 +80,8 @@ class APIGenerator {
         apiMethod: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        queryParams: queryParams,
+        hasBody: requestString!=null && requestString.isNotEmpty
       ),
       useCaseCode: generateUseCaseFiles(
         modelName: modelName,
@@ -74,6 +89,8 @@ class APIGenerator {
         method: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        queryParams: queryParams,
+        hasBody: requestString!=null && requestString.isNotEmpty
       ),
       requestCode: requestString,
     );
@@ -101,7 +118,7 @@ String getReturnDataModel(String modelName, JsonDtoOutputModel response) {
   return 'void';
 }
 
-String buildPathParameters(String serviceName) {
+String buildPathParameters(String serviceName, List<String> queryParams) {
   final bf = StringBuffer();
   final paths = serviceName.split('/');
   for (final path in paths) {
@@ -110,10 +127,13 @@ String buildPathParameters(String serviceName) {
       bf.writeln('''required String $cleanPath,''');
     }
   }
+  for (final query in queryParams) {
+    bf.writeln('''required String ${query.toCamel},''');
+  }
   return bf.toString();
 }
 
-String buildServicePathParameters(String serviceName) {
+String buildServicePathParameters(String serviceName , List<String> queryParams) {
   final bf = StringBuffer();
   final paths = serviceName.split('/');
   for (final path in paths) {
@@ -122,10 +142,13 @@ String buildServicePathParameters(String serviceName) {
       bf.writeln('''@Path("$cleanPath") required String $cleanPath,''');
     }
   }
+  for (final query in queryParams) {
+      bf.writeln('''@Query("$query") required String ${query.toCamel},''');
+  }
   return bf.toString();
 }
 
-String buildPathParametersValue(String serviceName) {
+String buildPathParametersValue(String serviceName , List<String> queryParams) {
   final bf = StringBuffer();
   final paths = serviceName.split('/');
   for (final path in paths) {
@@ -133,6 +156,9 @@ String buildPathParametersValue(String serviceName) {
       final cleanPath = path.replaceAll('{', '').replaceAll('}', '');
       bf.writeln('''$cleanPath:$cleanPath,''');
     }
+  }
+  for (final query in queryParams) {
+    bf.writeln('''${query.toCamel}:${query.toCamel},''');
   }
   return bf.toString();
 }
@@ -194,17 +220,7 @@ extension APIMethodTypeEx on APIMethodType {
     }
   }
 
-  bool hasBody() {
-    switch (this) {
-      case APIMethodType.get:
-        return false;
-      case APIMethodType.put:
-      case APIMethodType.update:
-      case APIMethodType.post:
-      case APIMethodType.patch:
-        return true;
-      case APIMethodType.delete:
-        return false;
-    }
+  bool hasBody(String request) {
+    return request.isNotEmpty;
   }
 }

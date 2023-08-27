@@ -43,7 +43,7 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                           child: RiveAnimation.asset('assets/5103-10277-handshake.riv' , fit: BoxFit.fitWidth,)),
                       const SizedBox(height: 16,),
                       SideMenuItem(
-                        itemText: 'Swagger Generation',
+                        itemText: 'Swagger Features Generation',
                         itemId: const SwaggerRouter(),
                         itemSelectedBackground: Colors.amberAccent,
                         onItemClicked: (destination) {

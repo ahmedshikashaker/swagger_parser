@@ -9,7 +9,9 @@ String generateUseCaseFiles(
       required String serviceName,
       required APIMethodType method,
       required JsonDtoOutputModel response,
-      required String requestModelName})  {
+      required String requestModelName,
+      required bool hasBody,
+      required List<String> queryParams})  {
 
   final serviceReturnModel  = getReturnDataModel(modelName , response);
 
@@ -19,7 +21,7 @@ String generateUseCaseFiles(
 import 'package:injectable/injectable.dart';
 import '../../../data/models/${modelName.toSnake}.dart';
 import '../../../data/repository/${modelName.toSnake}_repository.dart';
-${method.hasBody() ? "{import '../../../data/models/${modelName.toSnake}_request.dart';" : ""}
+${hasBody ? "{import '../../../data/models/${modelName.toSnake}_request.dart';" : ""}
 
 
 @injectable
@@ -30,12 +32,12 @@ class ${modelName.toPascal}UseCase{
   const ${modelName.toPascal}UseCase(this._repository);
 
     Future<Either<AppExceptions, $serviceReturnModel>> ${method
-      .getFunctionName().toCamel}${modelName.toPascal}(${method.hasBody()
-      ? '{required ${requestModelName.toCamel} ${requestModelName.toCamel},${buildPathParameters(serviceName)}}' : "{${buildPathParameters(serviceName)}}"}) async {
+      .getFunctionName().toCamel}${modelName.toPascal}(${hasBody
+      ? '{required ${requestModelName.toCamel} ${requestModelName.toCamel},${buildPathParameters(serviceName , queryParams)}}' : "{${buildPathParameters(serviceName , queryParams)}}"}) async {
       return _repository.${method
-      .getFunctionName().toCamel}${modelName.toPascal}(${method.hasBody()
+      .getFunctionName().toCamel}${modelName.toPascal}(${hasBody
       ? '''${requestModelName.toCamel}:${requestModelName.toCamel},
-           ${buildPathParametersValue(serviceName)}''' : buildPathParametersValue(serviceName)}
+           ${buildPathParametersValue(serviceName, queryParams)}''' : buildPathParametersValue(serviceName,queryParams)}
       ));
     }
 }

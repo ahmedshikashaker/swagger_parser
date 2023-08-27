@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Row(
             children: [
               const SizedBox(
-                width: 289,
+                width: 294,
                 child: ClipRRect(
                     borderRadius: BorderRadiusDirectional.only(
                         topEnd: Radius.circular(24), bottomEnd: Radius.circular(24)),

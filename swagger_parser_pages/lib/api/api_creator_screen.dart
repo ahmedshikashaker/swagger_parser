@@ -2,16 +2,19 @@ import 'dart:math' as math;
 
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_button/group_button.dart';
 import 'package:highlight/languages/json.dart';
 import 'package:swagger_parser/swagger_parser.dart';
 
 import 'package:swagger_parser_pages/api/api_generator_output.dart';
 import 'package:swagger_parser_pages/components/code_editor_widget.dart';
+import 'package:swagger_parser_pages/components/query_param/cubit/query_param_cubit.dart';
+import 'package:swagger_parser_pages/components/query_param/query_param_value.dart';
+import 'package:swagger_parser_pages/components/query_param/query_paramerter_list_widget.dart';
 
 // ignore: must_be_immutable
 class APICreatorScreen extends StatefulWidget {
-
   const APICreatorScreen({super.key});
 
   @override
@@ -32,80 +35,97 @@ class _State extends State<APICreatorScreen> {
   final CodeController _responseController = CodeController(
     language: json,
   );
-  final    GroupButtonController? buttonsController = GroupButtonController();
+  final GroupButtonController? buttonsController = GroupButtonController();
 
   ApiGeneratorOutput? apiGeneratorOutput;
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: _buildBody(),);
+    return BlocProvider(
+      create: (context) => QueryParamCubit(),
+      child: Scaffold(
+        body: _buildBody(),
+      ),
+    );
   }
 
   Widget _buildBody() {
-    return ListView(
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<QueryParamCubit, QueryParamState>(
+      builder: (context, state) {
+        return ListView(
           children: [
-            _createMethodSelector(),
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _createMethodSelector(),
+                Row(
+                  children: [
+                    _createModelNameInput(),
+                    _createEndPointInput(),
+                    _addQuery()
+                  ],
+                ),
+                const QueryParameterListWidget(),
+                CodeEditorWidget(
+                    title: 'Request body:', codeController: _requestController),
+                CodeEditorWidget(
+                    title: 'Response:', codeController: _responseController),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
             Row(
-              children: [_createModelNameInput(), _createEndPointInput()],
-            ),
-            CodeEditorWidget(
-                title: 'Request body:',
-                codeController: _requestController),
-            CodeEditorWidget(
-                title: 'Response:',
-                codeController: _responseController),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: 40,
-                  width: 300,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_modelTextEditingController.text.isNotEmpty &&
-                          _endpointTextEditingController.text.isNotEmpty) {
-                        APIGenerator()
-                            .generateAPICall(
-                          modelName: _modelTextEditingController.text,
-                          request: _requestController.text,
-                          response: _responseController.text,
-                          apiMethod: APIMethodType.values[buttonsController?.selectedIndex??1],
-                          serviceName: _endpointTextEditingController.text,
-                        ).then((value) async {
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                      height: 40,
+                      width: 300,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final cubit = context.read<QueryParamCubit>();
+                          if (_modelTextEditingController.text.isNotEmpty &&
+                              _endpointTextEditingController.text.isNotEmpty) {
+                            APIGenerator()
+                                .generateAPICall(
+                                    modelName: _modelTextEditingController.text,
+                                    request: _requestController.text,
+                                    response: _responseController.text,
+                                    apiMethod: APIMethodType.values[
+                                        buttonsController?.selectedIndex ?? 1],
+                                    serviceName:
+                                        _endpointTextEditingController.text,
+                                    queryParams: cubit.nonEmptyQueryParam)
+                                .then((value) async {
                               setState(() {
                                 apiGeneratorOutput = value;
                               });
-                        }).onError((error, stackTrace) {
-                          //TODO error
-                        });
-                      } else {
-                        //TODO error
-                      }
-                    },
-                    child: const Text('Generate'),
-                  )),
+                            }).onError((error, stackTrace) {
+                              //TODO error
+                            });
+                          } else {
+                            //TODO error
+                          }
+                        },
+                        child: const Text('Generate'),
+                      )),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            APIGeneratorOutputScreen(
+              apiGeneratorOutput: apiGeneratorOutput,
+              key: Key(math.Random().nextInt(3344555).toString()),
             ),
           ],
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        APIGeneratorOutputScreen(apiGeneratorOutput: apiGeneratorOutput,key: Key(math.Random().nextInt(3344555).toString()),),
-      ],
+        );
+      },
     );
   }
 
@@ -155,8 +175,7 @@ class _State extends State<APICreatorScreen> {
           controller: _modelTextEditingController,
           autofocus: false,
           decoration: const InputDecoration(
-              label: Text('Service name'),
-              contentPadding: EdgeInsets.all(10)),
+              label: Text('Service name'), contentPadding: EdgeInsets.all(10)),
         ),
       ),
     );
@@ -178,4 +197,28 @@ class _State extends State<APICreatorScreen> {
     );
   }
 
+  Widget _addQuery() {
+    return BlocBuilder<QueryParamCubit, QueryParamState>(
+      builder: (context, state) {
+        return SizedBox(
+          height: 60,
+          width: 200,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: ElevatedButton(
+              onPressed: () {
+                final cubit = context.read<QueryParamCubit>();
+                cubit.addQuery(
+                  QueryParamValue(
+                    fieldName: 'Query Name #${cubit.querys.length + 1}',
+                  ),
+                );
+              },
+              child: const Text('Add Query Param'),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
