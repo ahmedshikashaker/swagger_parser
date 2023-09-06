@@ -4,22 +4,22 @@ import 'package:swagger_parser/src/generator/api_template/api_usecase_template.d
 
 import '../../../swagger_parser.dart';
 import '../../utils/case_utils.dart';
+import 'api_cubit_template.dart';
 import 'api_remote_datasource_template.dart';
 import 'api_repository_template.dart';
 import 'api_service_code_template.dart';
+import 'api_state_template.dart';
 
 class APIGenerator {
   APIGenerator();
 
-  Future<ApiGeneratorOutput> generateAPICall({
-    required String modelName,
-    required String request,
-    required String response,
-    required APIMethodType apiMethod,
-    required String serviceName,
-    required List<String> queryParams
-  }) async {
-
+  Future<ApiGeneratorOutput> generateAPICall(
+      {required String modelName,
+      required String request,
+      required String response,
+      required APIMethodType apiMethod,
+      required String serviceName,
+      required List<String> queryParams}) async {
     String? requestString;
     if (request.isNotEmpty) {
       requestString = _generateModels(
@@ -29,69 +29,74 @@ class APIGenerator {
     }
 
     final serviceString = await generateServiceFiles(
-      serviceName: serviceName,
-      method: apiMethod,
-      modelName: modelName,
-      response: response.toDtoDart(),
-      queryParams: queryParams,
-      hasBody: requestString!=null && requestString.isNotEmpty
-    );
+        serviceName: serviceName,
+        method: apiMethod,
+        modelName: modelName,
+        response: response.toDtoDart(),
+        queryParams: queryParams,
+        hasBody: requestString != null && requestString.isNotEmpty);
 
     final modelString = _generateModels(
       modelName: modelName,
       json: response,
     );
 
-
     return ApiGeneratorOutput(
       serviceCode: serviceString,
       modelCode: modelString,
       repositoryCode: generateRepositoryCode(
-        modelName: modelName,
-        serviceName: serviceName,
-        apiMethod: apiMethod,
-        response: response.toDtoDart(),
-        requestModelName: '${modelName}_request',
-        queryParams: queryParams,
-        hasBody: requestString!=null && requestString.isNotEmpty
-      ),
+          modelName: modelName,
+          serviceName: serviceName,
+          apiMethod: apiMethod,
+          response: response.toDtoDart(),
+          requestModelName: '${modelName}_request',
+          queryParams: queryParams,
+          hasBody: requestString != null && requestString.isNotEmpty),
       repositoryImplCode: generateRepositoryImplCode(
-        modelName: modelName,
-        serviceName: serviceName,
-        apiMethod: apiMethod,
-        response: response.toDtoDart(),
-        requestModelName: '${modelName}_request',
-        queryParams: queryParams,
-        hasBody: requestString!=null && requestString.isNotEmpty
-      ),
+          modelName: modelName,
+          serviceName: serviceName,
+          apiMethod: apiMethod,
+          response: response.toDtoDart(),
+          requestModelName: '${modelName}_request',
+          queryParams: queryParams,
+          hasBody: requestString != null && requestString.isNotEmpty),
       dataSourceCode: generateDataSourceCode(
-        modelName: modelName,
-        serviceName: serviceName,
-        apiMethod: apiMethod,
-        response: response.toDtoDart(),
-        requestModelName: '${modelName}_request',
-        queryParams: queryParams,
-        hasBody: requestString!=null && requestString.isNotEmpty
-
-      ),
+          modelName: modelName,
+          serviceName: serviceName,
+          apiMethod: apiMethod,
+          response: response.toDtoDart(),
+          requestModelName: '${modelName}_request',
+          queryParams: queryParams,
+          hasBody: requestString != null && requestString.isNotEmpty),
       dataSourceImplCode: generateDataSourceImplCode(
+          modelName: modelName,
+          serviceName: serviceName,
+          apiMethod: apiMethod,
+          response: response.toDtoDart(),
+          requestModelName: '${modelName}_request',
+          queryParams: queryParams,
+          hasBody: requestString != null && requestString.isNotEmpty),
+      useCaseCode: generateUseCaseFiles(
+          modelName: modelName,
+          serviceName: serviceName,
+          method: apiMethod,
+          response: response.toDtoDart(),
+          requestModelName: '${modelName}_request',
+          queryParams: queryParams,
+          hasBody: requestString != null && requestString.isNotEmpty),
+      cubitCode: generateCubitCode(
         modelName: modelName,
         serviceName: serviceName,
         apiMethod: apiMethod,
         response: response.toDtoDart(),
         requestModelName: '${modelName}_request',
+        hasBody: requestString != null && requestString.isNotEmpty,
         queryParams: queryParams,
-        hasBody: requestString!=null && requestString.isNotEmpty
       ),
-      useCaseCode: generateUseCaseFiles(
-        modelName: modelName,
-        serviceName: serviceName,
-        method: apiMethod,
-        response: response.toDtoDart(),
-        requestModelName: '${modelName}_request',
-        queryParams: queryParams,
-        hasBody: requestString!=null && requestString.isNotEmpty
-      ),
+      stateCode: generateStateCode(
+          apiMethod: apiMethod,
+          modelName: modelName,
+          response: response.toDtoDart()),
       requestCode: requestString,
     );
   }
@@ -133,7 +138,8 @@ String buildPathParameters(String serviceName, List<String> queryParams) {
   return bf.toString();
 }
 
-String buildServicePathParameters(String serviceName , List<String> queryParams) {
+String buildServicePathParameters(
+    String serviceName, List<String> queryParams) {
   final bf = StringBuffer();
   final paths = serviceName.split('/');
   for (final path in paths) {
@@ -143,12 +149,12 @@ String buildServicePathParameters(String serviceName , List<String> queryParams)
     }
   }
   for (final query in queryParams) {
-      bf.writeln('''@Query("$query") required String ${query.toCamel},''');
+    bf.writeln('''@Query("$query") required String ${query.toCamel},''');
   }
   return bf.toString();
 }
 
-String buildPathParametersValue(String serviceName , List<String> queryParams) {
+String buildPathParametersValue(String serviceName, List<String> queryParams) {
   final bf = StringBuffer();
   final paths = serviceName.split('/');
   for (final path in paths) {
@@ -173,6 +179,8 @@ class ApiGeneratorOutput {
     this.dataSourceImplCode,
     this.repositoryImplCode,
     this.useCaseCode,
+    this.cubitCode,
+    this.stateCode,
   });
 
   String serviceCode;
@@ -183,6 +191,8 @@ class ApiGeneratorOutput {
   String repositoryCode;
   String? repositoryImplCode;
   String? useCaseCode;
+  String? cubitCode;
+  String? stateCode;
 }
 
 enum APIMethodType { post, get, update, patch, put, delete }

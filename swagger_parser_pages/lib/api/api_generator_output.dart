@@ -23,6 +23,8 @@ class _APIGeneratorOutputScreenState extends State<APIGeneratorOutputScreen> {
   CodeController repositoryController = CodeController(language: dart);
   CodeController repositoryImplController = CodeController(language: dart);
   CodeController useCaseController = CodeController(language: dart);
+  CodeController cubitController = CodeController(language: dart);
+  CodeController stateController = CodeController(language: dart);
 
   @override
   void initState() {
@@ -42,6 +44,8 @@ class _APIGeneratorOutputScreenState extends State<APIGeneratorOutputScreen> {
           widget.apiGeneratorOutput?.requestCode ?? '';
 
       useCaseController.text = widget.apiGeneratorOutput?.useCaseCode ?? '';
+      cubitController.text = widget.apiGeneratorOutput?.cubitCode ?? '';
+      stateController.text = widget.apiGeneratorOutput?.stateCode ?? '';
     }
     super.initState();
   }
@@ -82,6 +86,14 @@ class _APIGeneratorOutputScreenState extends State<APIGeneratorOutputScreen> {
               CodeViewerWidget(
                 codeController: useCaseController,
                 title: 'UseCase',
+              ),
+              CodeViewerWidget(
+                codeController: cubitController,
+                title: 'Cubit',
+              ),
+              CodeViewerWidget(
+                codeController: stateController,
+                title: 'State',
               ),
             ],
           )

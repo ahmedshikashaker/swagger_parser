@@ -377,8 +377,8 @@ class OpenApiParser {
             ? parametersV2(requestPath)
             : parametersV3(requestPath);
         final requestName =
-            requestPath[_operationIdConst]?.toString().toCamel ??
-                (key + path).toCamel;
+        (requestPath[_operationIdConst]?.toString().toCamel ??
+                (key + path).toCamel).replaceAll('Controller', '');
 
         final request = UniversalRequest(
           name: requestName,
